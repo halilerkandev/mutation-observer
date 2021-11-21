@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mutation Observer Example</title>
+  </head>
+  <body>
+    <div>
+      <h1>Mutation Observer Example</h1>
+      <p>
+        <button id="btn-add">Add</button>
+        <button id="btn-remove">Remove</button>
+      </p>
+      <p>
+        <label for="#input">Change Prefix with Press Enter</label>
+        <input type="text" id="input" />
+      </p>
+      <div id="container" name="main"></div>
+    </div>
+
+    <script>
+      const container = document.querySelector("#container");
+      const btnAdd = document.querySelector("#btn-add");
+      const btnRemove = document.querySelector("#btn-remove");
+
+      const input = document.querySelector("#input");
+      input.value = container.getAttribute("name");
+
+      let itemsCount = container.children.length;
+
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList") {
+            console.log("Child list changed");
+          }
+          if (mutation.type === "attributes") {
+            console.log("Attribute changed");
+
+            for (let i = 0; i < container.children.length; i++) {
+              container.children[i].innerHTML = `<p>${container.getAttribute(
+                "name"
+              )} ${container.children[i].getAttribute("number")}</p>`;
+            }
+          }
+        });
+      });
+
+      observer.observe(container, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
+
+      input.addEventListener("input", (e) => {
+        container.setAttribute("name", input.value);
+      });
+
+      btnAdd.addEventListener("click", () => {
+        const item = document.createElement("div");
+        item.classList.add("item");
+        item.setAttribute("number", `${++itemsCount}`);
+        item.innerHTML = `<p>${container.getAttribute(
+          "name"
+        )} ${item.getAttribute("number")}</p>`;
+        container.appendChild(item);
+      });
+
+      btnRemove.addEventListener("click", () => {
+        const item = container.querySelector(".item");
+        if (item) {
+          container.removeChild(item);
+        }
+      });
+    </script>
+  </body>
+</html>
